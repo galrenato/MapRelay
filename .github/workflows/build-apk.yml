@@ -1,8 +1,11 @@
 name: Build MapRelay APK
 
-on:
+"on":
   workflow_dispatch:
-
+  push:
+    branches:
+      - main
+      
 permissions:
   contents: read
 
