@@ -28,6 +28,18 @@ jobs:
         with:
           gradle-version: '8.9'
 
+      - name: Install Android SDK command-line tools
+        run: |
+          mkdir -p "$ANDROID_HOME/cmdline-tools"
+          cd "$RUNNER_TEMP"
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          mkdir -p android-tools
+          unzip -q commandlinetools-linux-11076708_latest.zip -d android-tools
+          mkdir -p "$ANDROID_HOME/cmdline-tools/latest"
+          cp -r android-tools/cmdline-tools/. "$ANDROID_HOME/cmdline-tools/latest/"
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
+
       - name: Install Android SDK components
         run: |
           yes | sdkmanager --licenses
