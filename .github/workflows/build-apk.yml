@@ -50,6 +50,11 @@ jobs:
           mkdir -p "$RUNNER_TEMP/maprelay"
           unzip -q MapRelay-cloud-build-fixed.zip -d "$RUNNER_TEMP/maprelay"
 
+      - name: Replace ShareActivity with updated version
+        run: |
+          cp MapRelay/app/src/main/java/com/example/maprelay/ShareActivity.kt \
+            "$RUNNER_TEMP/maprelay/MapRelay/app/src/main/java/com/example/maprelay/ShareActivity.kt"
+
       - name: Build APK
         run: |
           gradle -p "$RUNNER_TEMP/maprelay/MapRelay" --no-daemon assembleDebug
