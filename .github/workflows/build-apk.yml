@@ -1,3 +1,4 @@
+
 name: Build MapRelay APK
 
 "on":
@@ -45,15 +46,49 @@ jobs:
           yes | sdkmanager --licenses
           sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Extract project
+      - name: Extract Android project
         run: |
           mkdir -p "$RUNNER_TEMP/maprelay"
           unzip -q MapRelay-cloud-build-fixed.zip -d "$RUNNER_TEMP/maprelay"
 
-      - name: Replace ShareActivity with updated version
+      - name: Copy updated Tesla-first Kotlin source
         run: |
           cp MapRelay/app/src/main/java/com/example/maprelay/ShareActivity.kt \
             "$RUNNER_TEMP/maprelay/MapRelay/app/src/main/java/com/example/maprelay/ShareActivity.kt"
+
+      - name: Install MapRelay logo
+        run: |
+          mkdir -p "$RUNNER_TEMP/maprelay/MapRelay/app/src/main/res/drawable-nodpi"
+          cp MapRelay/app/src/main/res/drawable-nodpi/ic_maprelay.jpg \
+            "$RUNNER_TEMP/maprelay/MapRelay/app/src/main/res/drawable-nodpi/ic_maprelay.jpg"
+
+      - name: Configure application and sharing icons
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          manifest = Path(
+              "/tmp/unused"
+          )
+          import os
+          manifest = Path(os.environ["RUNNER_TEMP"]) / "maprelay/MapRelay/app/src/main/AndroidManifest.xml"
+          content = manifest.read_text()
+
+          content = content.replace(
+              '<application\n',
+              '<application\n        android:icon="@drawable/ic_maprelay"\n        android:roundIcon="@drawable/ic_maprelay"\n',
+              1
+          )
+
+          content = content.replace(
+              '<activity\n',
+              '<activity\n            android:icon="@drawable/ic_maprelay"\n',
+              1
+          )
+
+          manifest.write_text(content)
+          print("Application and sharing icons configured.")
+          PY
 
       - name: Build APK
         run: |
